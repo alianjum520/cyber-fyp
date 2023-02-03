@@ -1,0 +1,24 @@
+from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
+from .views import (
+    MyTokenObtainPairView,
+    RegisterView,
+    AccountView,
+    ChangePasswordView,
+    FollowUserAPIView,
+    FollowRequestActionAPIView,
+    FollowRequestListView,
+    FollowingAndFollowersView
+    )
+
+urlpatterns = [
+    path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('register/', RegisterView.as_view(), name = 'register'),
+    path('account/', AccountView.as_view(), name = 'account'),
+    path('change-password/', ChangePasswordView.as_view(), name = 'change-password'),
+    path('follow-user/<int:to_follow_id>', FollowUserAPIView.as_view(), name = 'follow-user'),
+    path('follow-user-action/<int:action>/<int:follow_request_id>', FollowRequestActionAPIView.as_view(), name = 'follow-user-action'),
+    path('request-list/', FollowRequestListView.as_view(), name = 'request-list'),
+    path('followers-list/', FollowingAndFollowersView.as_view(), name = 'followers-list'),
+]
