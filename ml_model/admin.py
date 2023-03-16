@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (ClassifyCyberBullying, CyberBullyingOrNot, Slang, EthnicityAndRaceGlossary,
-                     AgeGlossary, GenderGlossary, ReleigionGlossary, Negation)
+                     AgeGlossary, GenderGlossary, ReleigionGlossary, Negation, OffensiveWithSeverity)
 
 # Register your models here.
 class CyberBullyingOrNotAdmin(admin.ModelAdmin):
@@ -39,6 +39,9 @@ class NegationAdmin(admin.ModelAdmin):
     list_display = ['id', 'word']
 
 
+class OffensiveWithSeverityAdmin(admin.ModelAdmin):
+    list_display = ['id', 'word', 'severity']
+
 admin.site.register(CyberBullyingOrNot, CyberBullyingOrNotAdmin)
 admin.site.register(ClassifyCyberBullying, ClassifyCyberBullyingAdmin)
 admin.site.register(Slang, SlangAdmin)
@@ -47,3 +50,4 @@ admin.site.register(AgeGlossary, AgeGlossaryAdmin)
 admin.site.register(GenderGlossary, GenderGlossaryAdmin)
 admin.site.register(ReleigionGlossary, ReleigionGlossaryAdmin)
 admin.site.register(Negation, NegationAdmin)
+admin.site.register(OffensiveWithSeverity, OffensiveWithSeverityAdmin)
