@@ -1,7 +1,7 @@
 from social_network.models import Tweet, Comment
 from rest_framework import serializers
 from accounts.models import User
-
+import CyberbullyingDetectionClass as model
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -19,6 +19,20 @@ class UserTweetSerializer(serializers.ModelSerializer):
         model = Tweet
         fields = ['user', 'text']
 
+    def validate(self, attrs):
+        #import CyberbullyingDetectionClass as model
+        model.text[0] = attrs['text']
+        result_val = model.scan.detectBullying(model.text)
+        #print(result_val)
+        if(result_val['Offensive Words'] != "None"):
+            raise serializers.ValidationError({"comment": "You have entered offensive words: " + str(result_val['Offensive Words'])\
+                + ",Severity Level of your Content is: " + str(result_val['Severity Level']) 
+                + ",Type of Bullying you are doing is: " + str(result_val['Type'])
+
+                                               })
+        elif(result_val['Offensive Words']=="None"):
+            return attrs
+        return attrs
     def create(self, validated_data):
         validated_data["user"] = self.context["request"].user
         tweet = Tweet.objects.create(**validated_data)
@@ -63,6 +77,20 @@ class AddCommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'user', 'tweet', 'comment']
 
+    def validate(self, attrs):
+        #import CyberbullyingDetectionClass as model
+        model.text[0] = attrs['comment']
+        result_val = model.scan.detectBullying(model.text)
+        #print(result_val)
+        if(result_val['Offensive Words'] != "None"):
+            raise serializers.ValidationError({"comment": "You have entered offensive words: " + str(result_val['Offensive Words'])\
+                + ",Severity Level of your Content is: " + str(result_val['Severity Level']) 
+                + ",Type of Bullying you are doing is: " + str(result_val['Type'])
+
+                                               })
+        elif(result_val['Offensive Words']=="None"):
+            return attrs
+        return attrs
 
 class AddReplySerializer(serializers.ModelSerializer):
 
@@ -74,6 +102,19 @@ class AddReplySerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'user', 'tweet', 'comment', 'parent']
 
+    def validate(self, attrs):
+        model.text[0] = attrs['comment']
+        result_val = model.scan.detectBullying(model.text)
+        #print(result_val)
+        if(result_val['Offensive Words'] != "None"):
+            raise serializers.ValidationError({"comment": "You have entered offensive words: " + str(result_val['Offensive Words'])\
+                + ",Severity Level of your Content is: " + str(result_val['Severity Level']) 
+                + ",Type of Bullying you are doing is: " + str(result_val['Type'])
+
+                                               })
+        elif(result_val['Offensive Words']=="None"):
+            return attrs
+        return attrs
 
 
 

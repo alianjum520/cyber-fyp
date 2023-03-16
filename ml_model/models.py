@@ -70,3 +70,11 @@ class Negation(models.Model):
 
     def __str__(self):
         return self.word
+    
+
+class OffensiveWithSeverity(models.Model):
+    word = models.CharField(max_length=250)
+    severity = models.IntegerField()
+    
+    def __str__(self):
+        return self.word
