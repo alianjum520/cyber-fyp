@@ -6,16 +6,17 @@ from django.contrib.auth.hashers import check_password
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = self.get_token(self.user)
 
-        # Add custom claims
-        token['username'] = user.username
-        token['email'] = user.email
-        # ...
+        # Add extra responses here
+        data['id'] = self.user.id
+        data['is_verified'] = self.user.is_verified
+        data['username'] = self.user.username
+        data['email'] = self.user.email
 
-        return token
+        return data
 
 
 class RegisterSerializer(serializers.ModelSerializer):

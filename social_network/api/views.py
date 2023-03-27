@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import  IsAuthenticated,AllowAny
+from accounts.api.permissions import IsVerifiedUser
 
 
 class UserTweetViewset(viewsets.ModelViewSet):
@@ -16,7 +17,7 @@ class UserTweetViewset(viewsets.ModelViewSet):
     user can crete update and delete its album
     """
 
-    permission_classes= [IsAuthenticated]
+    permission_classes= [IsVerifiedUser]
     queryset = Tweet.objects.all()
     serializer_class = UserTweetSerializer
 
@@ -48,7 +49,7 @@ class TweetDetailView(APIView):
 
 class AddCommentView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsVerifiedUser]
     serializer_class = AddCommentSerializer
 
 
@@ -71,7 +72,7 @@ class AddCommentView(APIView):
 
 class AddReplyView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsVerifiedUser]
     serializer_class = AddReplySerializer
 
 

@@ -66,6 +66,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
+    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.MyTokenObtainPairSerializer",
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
@@ -74,9 +75,9 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -170,7 +171,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #CORS_ALLOWED_ORIGINS = [
 #    "https://example.com",
 #]
-CORS_ALLOW_ALL_ORIGINS: True
 CORS_ORIGIN_WHITELIST = (
         'http://localhost:3000',
     )

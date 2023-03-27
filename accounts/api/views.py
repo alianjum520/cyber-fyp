@@ -223,7 +223,7 @@ class AccountView(APIView):
 
 class ChangePasswordView(APIView):
     serializer_class = ChangePasswordSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsVerifiedUser]
 
     def put(self, request):
         queryset = User.objects.get(username=request.user.username)
@@ -242,7 +242,7 @@ class FollowUserAPIView(APIView):
     APIView to make a request (or directly follow is user to be followed
     has a public account) by an authenticated user.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsVerifiedUser,)
 
     def post(self,request, to_follow_id):
 
@@ -263,7 +263,7 @@ class FollowRequestActionAPIView(APIView):
     who is being requested to act upon said request.
     """
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsVerifiedUser,)
 
     def post(self, request, action, follow_request_id):
 
@@ -286,7 +286,7 @@ class FollowRequestActionAPIView(APIView):
 
 class FollowRequestListView(ListAPIView):
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsVerifiedUser,)
     serializer_class = FollowRequestSerializer
 
     def get_queryset(self):
@@ -294,7 +294,7 @@ class FollowRequestListView(ListAPIView):
 
 class FollowingAndFollowersView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsVerifiedUser]
     serializer_class = FollowersAndFollowingSerializer
 
     def get(self, request):
