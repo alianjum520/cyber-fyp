@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, FollowRequest
+from .models import User, FollowRequest, OTPVerification
 
 # Register your models here.
 class UserAdmin(admin.ModelAdmin):
@@ -10,4 +10,5 @@ class UserAdmin(admin.ModelAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(FollowRequest)
+admin.site.register(OTPVerification)
 

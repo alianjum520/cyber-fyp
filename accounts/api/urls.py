@@ -8,8 +8,14 @@ from .views import (
     FollowUserAPIView,
     FollowRequestActionAPIView,
     FollowRequestListView,
-    FollowingAndFollowersView
-    )
+    FollowingAndFollowersView,
+    VerifyOtp,
+    RenewOtp,
+    FindAccountView,
+    ConfirmOtp,
+    ResendOtp,
+    ForgetPasswordView
+)
 
 urlpatterns = [
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -21,4 +27,10 @@ urlpatterns = [
     path('follow-user-action/<int:action>/<int:follow_request_id>', FollowRequestActionAPIView.as_view(), name = 'follow-user-action'),
     path('request-list/', FollowRequestListView.as_view(), name = 'request-list'),
     path('followers-list/', FollowingAndFollowersView.as_view(), name = 'followers-list'),
+    path('verify-otp/', VerifyOtp.as_view(), name = 'verify-otp'),
+    path('renew-otp/', RenewOtp.as_view(), name = 'renew-otp'),
+    path('find-account/', FindAccountView.as_view()),
+    path('confirm-otp/', ConfirmOtp.as_view()),
+    path('resend-otp/', ResendOtp.as_view()),
+    path('forget-password/', ForgetPasswordView.as_view()),
 ]

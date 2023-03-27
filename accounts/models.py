@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.serializers import serialize
+from django.core.validators import MaxValueValidator, MinValueValidator
 import json
 
 
@@ -67,6 +68,19 @@ class User(AbstractUser):
     def followers_count(self):
         """ Returns a QuerySet of total Users following this user. """
         return self.followed_by.all().count()
+
+
+class OTPVerification(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    otp = models.IntegerField()
+    expired  = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expiration_time = models.DateTimeField(blank = True, null=True)
+
+
+    def __str__(self):
+        return self.user.username
 
 
 class FollowRequest(DateModel):
