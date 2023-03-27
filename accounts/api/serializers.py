@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
-from accounts.models import User, FollowRequest
+from accounts.models import User, FollowRequest, OTPVerification
 from django.contrib.auth.hashers import check_password
 
 
@@ -150,3 +150,34 @@ class FollowersAndFollowingSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'following', 'followers', 'following_count', 'followers_count']
+
+
+class OTPVerificationSerializer(serializers.ModelSerializer):
+    otp2 = serializers.CharField(required=True)
+
+    class Meta:
+        model = OTPVerification
+        fields = "__all__"
+
+
+class FindUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['email']
+
+class ForgetPasswordSerializer(serializers.ModelSerializer):
+
+    new_password = serializers.CharField(write_only = True)
+
+    class Meta:
+        model = User
+        fields = ['new_password']
+
+    def update(self, instance, validated_data):
+        
+        user = User.objects.get(email = self.context['request'])
+        user.set_password(validated_data.get('new_password'))
+        user.save()
+    
+        return instance
