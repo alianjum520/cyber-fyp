@@ -1,4 +1,4 @@
-from social_network.models import Tweet, Comment
+from social_network.models import Tweet, Comment, Like
 from rest_framework import serializers
 from accounts.models import User
 import CyberbullyingDetectionClass as model
@@ -17,7 +17,7 @@ class UserTweetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tweet
-        fields = ['user', 'text']
+        fields = ['id','user', 'text']
 
     def validate(self, attrs):
         #import CyberbullyingDetectionClass as model
@@ -38,7 +38,7 @@ class UserTweetSerializer(serializers.ModelSerializer):
         tweet = Tweet.objects.create(**validated_data)
 
         return tweet
-
+    
 
 class ReplySerializer(serializers.ModelSerializer):
 
@@ -59,13 +59,23 @@ class CommentSerializer(serializers.ModelSerializer):
         fields =['id','user', 'comment', 'replies']
 
 
+class LikeSerializer(serializers.ModelSerializer):
+    
+    user = UserSerializer(read_only = True)
+
+    class Meta:
+        model = Like
+        fields = ['id', 'user', 'like']
+
+
 class TweetDetailSerializer(serializers.ModelSerializer):
 
+    likes = LikeSerializer(many = True)
     comments = CommentSerializer(many = True)
 
     class Meta:
         model = Tweet
-        fields = ['id' ,'text', 'comments']
+        fields = ['id' ,'text', 'comments', 'likes']
 
 
 class AddCommentSerializer(serializers.ModelSerializer):
@@ -117,5 +127,11 @@ class AddReplySerializer(serializers.ModelSerializer):
         return attrs
 
 
+class AddLikeSerializer(serializers.ModelSerializer):
 
+    tweet = UserTweetSerializer(read_only = True)
+    user = UserSerializer(read_only = True)
 
+    class Meta:
+        model = Like
+        fields = ['id', 'user', 'tweet', 'like']
