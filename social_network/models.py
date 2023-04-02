@@ -35,5 +35,5 @@ class Comment(DateModel):
 
 class Like(DateModel):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
-    tweet = models.ForeignKey(Tweet, on_delete = models.CASCADE)
+    tweet = models.ForeignKey(Tweet, on_delete = models.CASCADE, related_name="likes")
     like = models.BooleanField(default=False)

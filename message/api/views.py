@@ -5,10 +5,11 @@ from accounts.models import User
 from message.models import Message
 from .serializers import MessageSerializer
 from rest_framework.views import APIView
+from accounts.api.permissions import IsVerifiedUser
 
 class MessageView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsVerifiedUser]
     serializer_class = MessageSerializer
 
     def get(self, request, friend_id):
