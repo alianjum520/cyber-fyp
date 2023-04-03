@@ -4,7 +4,7 @@ from .serializers import (MyTokenObtainPairSerializer, RegisterSerializer,
                           FollowersAndFollowingSerializer, FindUserSerializer, ForgetPasswordSerializer
                         )
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from rest_framework import status
 from accounts.models import User, FollowRequest, OTPVerification
@@ -15,6 +15,7 @@ import random
 from datetime import datetime,timedelta
 import pytz
 from .permissions import IsVerifiedUser
+from django.core.mail import send_mail
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -30,21 +31,29 @@ class RegisterView(generics.GenericAPIView):
 
         if serializer.is_valid():
 
-            serializer.save()
-            user_data = serializer.data
-            print(user_data)
-            user = User.objects.get(username=user_data['username'] ,email=user_data['email'])
-            user.is_verified = False
-            user.save()
-            otp = random.randint(1000,9999)
-            create_otp= OTPVerification.objects.create(user=user,otp = otp)
-            future_time = create_otp.created_at + timedelta(minutes=2)
-            create_otp.expiration_time  = future_time
-            create_otp.save()
-            print(otp)
-            print(create_otp)
-
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
+            
+            user_data = serializer.validated_data
+            try:
+                serializer.save()
+                user_data = serializer.data
+                user = User.objects.get(username=user_data['username'] ,email=user_data['email'])
+                user.is_verified = False
+                user.save()
+                otp = random.randint(1000,9999)
+                create_otp= OTPVerification.objects.create(user=user,otp = otp)
+                future_time = create_otp.created_at + timedelta(minutes=2)
+                create_otp.expiration_time  = future_time
+                create_otp.save()
+                send_mail(
+                    'Otp To Verify Account',
+                    'Your Otp is: {}'.format(otp),
+                    'alt.do-doxpg7ov@yopmail.com',
+                    [user.email],
+                    fail_silently=False,
+                )
+                return Response(serializer.data, status = status.HTTP_201_CREATED)
+            except User.DoesNotExist:
+                return Response(serializer.data, status = status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
@@ -55,9 +64,7 @@ class VerifyOtp(APIView):
 
         user = OTPVerification.objects.get(user = request.user)
         check_otp = request.data.get('otp')
-        print(check_otp)
-
-        print(user.user.username)
+        
         utc=pytz.UTC
         if utc.localize(datetime.now()) < user.expiration_time:
             print(user.created_at)
@@ -66,7 +73,7 @@ class VerifyOtp(APIView):
                 user.user.is_verified = True
                 user.expired = True
                 user.user.save()
-                print(user.user.is_verified)
+                
                 return Response('User Verified Successfully')
             else:
                 return Response('Invalid Token')
@@ -82,18 +89,23 @@ class RenewOtp(APIView):
     def post(self, request):
 
         otp = OTPVerification.objects.get(user = request.user)
-        print(otp.user.is_verified)
+       
         if otp.user.is_verified == False:
             create_otp = random.randint(1000,9999)
             utc=pytz.UTC
             otp.otp = create_otp
             future_time = utc.localize(datetime.now()) + timedelta(minutes=2)
-            print(future_time)
+        
             otp.expiration_time  = future_time
             otp.expired = False
             otp.save()
-            print(otp)
-            print(create_otp)
+            send_mail(
+                    'Otp To Verify Account',
+                    'Your Otp is: {}'.format(otp.otp),
+                    'alt.do-doxpg7ov@yopmail.com',#zudaxukutro-4405@yopmail.com
+                    [otp.user.email],
+                    fail_silently=False,
+                )
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -119,11 +131,17 @@ class FindAccountView(APIView):
             utc=pytz.UTC
             otp.otp = create_otp
             future_time = utc.localize(datetime.now()) + timedelta(minutes=2)
-            print(future_time)
+            
             otp.expiration_time  = future_time
             otp.expired = False
             otp.save()
-            print(otp.otp)
+            send_mail(
+                    'Otp To Verify Account',
+                    'Your Otp is: {}'.format(otp.otp),
+                    'alt.do-doxpg7ov@yopmail.com',
+                    [otp.user.email],
+                    fail_silently=False,
+                )
             return Response({"Success": "Otp sent successfully"}, status=status.HTTP_200_OK)
         except OTPVerification.DoesNotExist:
             return Response({"Fail": "Otp sent failure"}, status=status.HTTP_400_BAD_REQUEST)
@@ -137,7 +155,6 @@ class ConfirmOtp(APIView):
 
         user = OTPVerification.objects.get(user__email = request.data.get("email"))
         check_otp = request.data.get('otp')
-        print(check_otp)
 
         print(user.user.username)
         utc=pytz.UTC
@@ -172,7 +189,13 @@ class ResendOtp(APIView):
             otp.expiration_time  = future_time
             otp.expired = False
             otp.save()
-            print(otp.otp)
+            send_mail(
+                    'Otp To Verify Account',
+                    'Your Otp is: {}'.format(otp.otp),
+                    'alt.do-doxpg7ov@yopmail.com',
+                    [otp.user.email],
+                    fail_silently=False,
+                )
             return Response(status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
