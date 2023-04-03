@@ -174,3 +174,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_WHITELIST = (
         'http://localhost:3000',
     )
+#EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND= 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = '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'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
