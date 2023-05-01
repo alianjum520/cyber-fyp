@@ -8,37 +8,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username']
+        fields = ['username', 'first_name', 'last_name']
 
-
-class UserTweetSerializer(serializers.ModelSerializer):
-
-    user = UserSerializer(read_only = True, many = False)
-
-    class Meta:
-        model = Tweet
-        fields = ['id','user', 'text']
-
-    def validate(self, attrs):
-        #import CyberbullyingDetectionClass as model
-        model.text[0] = attrs['text']
-        result_val = model.scan.detectBullying(model.text)
-        #print(result_val)
-        if(result_val['Offensive Words'] != "None"):
-            raise serializers.ValidationError({"comment": "You have entered offensive words: " + str(result_val['Offensive Words'])\
-                + ",Severity Level of your Content is: " + str(result_val['Severity Level']) 
-                + ",Type of Bullying you are doing is: " + str(result_val['Type'])
-
-                                               })
-        elif(result_val['Offensive Words']=="None"):
-            return attrs
-        return attrs
-    def create(self, validated_data):
-        validated_data["user"] = self.context["request"].user
-        tweet = Tweet.objects.create(**validated_data)
-
-        return tweet
-    
 
 class ReplySerializer(serializers.ModelSerializer):
 
@@ -68,14 +39,64 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'like']
 
 
+class ShareSerializer(serializers.ModelSerializer):
+    
+    user = UserSerializer(read_only = True)
+
+    class Meta:
+        model = Tweet
+        fields = ['id', 'user', 'text']
+
+
+class UserTweetSerializer(serializers.ModelSerializer):
+
+    user = UserSerializer(read_only = True, many = False)
+
+    class Meta:
+        model = Tweet
+        fields = ['id','user', 'text',  'updated_at']
+
+    def validate(self, attrs):
+        #import CyberbullyingDetectionClass as model
+        model.text[0] = attrs['text']
+        result_val = model.scan.detectBullying(model.text)
+        #print(result_val)
+        if(result_val['Offensive Words'] != "None"):
+            raise serializers.ValidationError({"comment": "You have entered offensive words: " + str(result_val['Offensive Words'])\
+                + ",Severity Level of your Content is: " + str(result_val['Severity Level']) 
+                + ",Type of Bullying you are doing is: " + str(result_val['Type'])
+
+                                               })
+        elif(result_val['Offensive Words']=="None"):
+            return attrs
+        return attrs
+    def create(self, validated_data):
+        validated_data["user"] = self.context["request"].user
+        tweet = Tweet.objects.create(**validated_data)
+
+        return tweet
+
+
+class ShareTweetSerializer(serializers.ModelSerializer):
+
+    parent = UserTweetSerializer(read_only = True)
+    user = UserSerializer(read_only = True)
+
+    class Meta:
+        model = Tweet
+        fields = ['id', 'text','user', 'parent']
+
+
 class TweetDetailSerializer(serializers.ModelSerializer):
 
     likes = LikeSerializer(many = True)
     comments = CommentSerializer(many = True)
+    share = ShareSerializer(many = True)
+    user = UserSerializer(read_only = True)
 
     class Meta:
         model = Tweet
-        fields = ['id' ,'text', 'comments', 'likes']
+        fields = ['id', 'user', 'text', 'share', 'comments', 'likes', 'updated_at']
 
 
 class AddCommentSerializer(serializers.ModelSerializer):
