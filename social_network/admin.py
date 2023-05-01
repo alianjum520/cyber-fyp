@@ -3,7 +3,7 @@ from .models import Tweet, Comment, Like
 
 # Register your models here.
 class TweetAdmin(admin.ModelAdmin):
-    list_display = ['id', 'text', 'user']
+    list_display = ['id', 'text', 'user','updated_at', 'created_at']
     search_fields = ['text']
     list_filter=['user']
 

@@ -67,21 +67,19 @@ class VerifyOtp(APIView):
         
         utc=pytz.UTC
         if utc.localize(datetime.now()) < user.expiration_time:
-            print(user.created_at)
-            print(user.expiration_time)
             if user.otp == check_otp:
                 user.user.is_verified = True
                 user.expired = True
                 user.user.save()
                 
-                return Response('User Verified Successfully')
+                return Response({"Token":'User Verified Successfully'}, status = status.HTTP_200_OK)
             else:
-                return Response('Invalid Token')
+                return Response({'Token':'Invalid Token'},status =status.HTTP_400_BAD_REQUEST)
             
         else:
             user.expired = True
             user.save()
-            return Response('Token Expired')
+            return Response({"Token":'Token Expired'}, status= status.HTTP_400_BAD_REQUEST)
 
 
 class RenewOtp(APIView):
@@ -115,16 +113,18 @@ class FindAccountView(APIView):
     serializer_class = FindUserSerializer
     permission_classes = [AllowAny]
 
-    def get(self, request):
+    def post(self, request):
         try:
             query = User.objects.get(email=request.data.get("email"))
             serializer = self.serializer_class(query)
             return Response(serializer.data, status = status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"Fail": "This user doest not exists"}, status = status.HTTP_400_BAD_REQUEST)
-    
-    def post(self, request):
 
+
+class SendOtp(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
         try:
             otp = OTPVerification.objects.get(user__email = request.data.get("email"))
             create_otp = random.randint(1000,9999)
@@ -164,14 +164,14 @@ class ConfirmOtp(APIView):
             if user.otp == check_otp:
                 user.expired = True
                 user.user.save()
-                return Response({'Otp matched'}, status=status.HTTP_200_OK)
+                return Response({"Success":'Otp matched'}, status=status.HTTP_200_OK)
             else:
-                return Response({'Invalid Token'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"Fail":'Invalid Token'}, status=status.HTTP_400_BAD_REQUEST)
             
         else:
             user.expired = True
             user.save()
-            return Response('Token Expired', status=status.HTTP_400_BAD_REQUEST)
+            return Response({"Fail":'Token Expired'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ResendOtp(APIView):
@@ -326,3 +326,31 @@ class FollowingAndFollowersView(APIView):
 
         serializer = self.serializer_class(queryset)
         return Response(serializer.data, status = status.HTTP_200_OK)
+
+    def delete(self,request,pk):
+
+        """
+        This function is used to delete the like from liked table
+        """
+        remover = User.objects.get(username = request.user.username)
+        user = User.objects.get(pk = pk)
+        remover.follows.remove(user)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class RemoveFollower(APIView):
+
+    permission_classes = [IsVerifiedUser]
+    serializer_class = FollowersAndFollowingSerializer
+
+    def delete(self,request,pk):
+
+        """
+        This function is used to delete the like from liked table
+        """
+        remover = User.objects.get(username = request.user.username)
+        user = User.objects.get(pk = pk)
+        remover.followed_by.remove(user)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

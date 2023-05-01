@@ -42,8 +42,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"password": "Password fields didn't match."})
 
-        if get_year < 18:
-            raise serializers.ValidationError({"date_of_birth": "You are not compatiable to use this app"})
+        if get_year < 10:
+            raise serializers.ValidationError({"date_of_birth": "You are shoulder be older than 12 years to use this app"})
 
         return attrs
 
@@ -70,9 +70,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
-        '''fields = ['username', 'email', 'first_name',
-            'last_name', 'phone_number', 'bio', 'is_private']'''
+        fields = ['first_name','last_name', 'bio', 'is_private']
 
 
     def update(self, instance, validated_data):
@@ -150,7 +148,7 @@ class FollowersAndFollowingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'following', 'followers', 'following_count', 'followers_count']
+        fields = ['username', 'bio', 'first_name', 'last_name', 'following', 'followers', 'following_count', 'followers_count']
 
 
 class OTPVerificationSerializer(serializers.ModelSerializer):

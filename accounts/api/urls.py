@@ -1,5 +1,5 @@
 from django.urls import path
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView,  TokenBlacklistView
 from .views import (
     MyTokenObtainPairView,
     RegisterView,
@@ -14,7 +14,9 @@ from .views import (
     FindAccountView,
     ConfirmOtp,
     ResendOtp,
-    ForgetPasswordView
+    ForgetPasswordView,
+    SendOtp,
+    RemoveFollower
 )
 
 urlpatterns = [
@@ -27,10 +29,14 @@ urlpatterns = [
     path('follow-user-action/<int:action>/<int:follow_request_id>/', FollowRequestActionAPIView.as_view(), name = 'follow-user-action'),
     path('request-list/', FollowRequestListView.as_view(), name = 'request-list'),
     path('followers-list/', FollowingAndFollowersView.as_view(), name = 'followers-list'),
+    path('followers-list/<int:pk>/', FollowingAndFollowersView.as_view(), name = 'followers-list'),
     path('verify-otp/', VerifyOtp.as_view(), name = 'verify-otp'),
     path('renew-otp/', RenewOtp.as_view(), name = 'renew-otp'),
     path('find-account/', FindAccountView.as_view()),
+    path('send-otp/', SendOtp.as_view()),
     path('confirm-otp/', ConfirmOtp.as_view()),
     path('resend-otp/', ResendOtp.as_view()),
     path('forget-password/', ForgetPasswordView.as_view()),
+    path('logout/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('remove-follower/<int:pk>/', RemoveFollower.as_view(), name = 'remove-follower'),
 ]

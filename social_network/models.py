@@ -5,6 +5,7 @@ from accounts.models import DateModel, User
 class Tweet(DateModel):
     text  = models.TextField()
     user = models.ForeignKey(User, on_delete = models.CASCADE)
+    parent = models.ForeignKey('self' , null=True , blank=True , on_delete=models.CASCADE , related_name='share')
     
     def __str__(self):
         return  self.text
